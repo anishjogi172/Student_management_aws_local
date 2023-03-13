@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Student Management System</title>
+	<style>
+		h1 {
+			text-align: center;
+			color: #008080;
+			font-size: 36px;
+			margin-top: 20px;
+			margin-bottom: 20px;
+		}
+
+		form {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			margin-bottom: 20px;
+		}
+
+		label {
+			font-size: 18px;
+			margin-right: 10px;
+		}
+
+		input[type="text"] {
+			padding: 10px;
+			font-size: 18px;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+		}
+
+		button[type="submit"] {
+			background-color: #008080;
+			color: #fff;
+			border: none;
+			padding: 10px 20px;
+			font-size: 18px;
+			border-radius: 4px;
+			cursor: pointer;
+			transition: background-color 0.2s ease;
+		}
+
+		button[type="submit"]:hover {
+			background-color: #006666;
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-bottom: 20px;
+		}
+
+		th,
+		td {
+			padding: 10px;
+			text-align: left;
+			border: 1px solid #ccc;
+			font-size: 18px;
+		}
+
+		th {
+			background-color: #008080;
+			color: #fff;
+		}
+		button:hover{
+			background-color:#800080 ;
+		}
+		button:active{
+			background-color: #800000;
+			box-shadow: 0 5px rgb(255, 0, 0);
+  transform: translateY(4px);
+		}			
+		
+	</style>
+</head>
+
+<body>
+	<h1>Student Management System</h1>
+	<form id="add-student-form">
+		<label for="name">Please Enter Name:</label>
+		<input type="text" id="name" name="name" required>
+		<button type="submit">Add Student</button>
+	</form>
+	<table>
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>Name</th>
+			</tr>
+		</thead>
+		<tbody id="student-table">
+		</tbody>
+	</table>
+	<script>
+		const studentTable = document.getElementById('student-table');
+
+
+		function updateStudentTable() {
+			fetch('http://localhost:8080/students')
+				.then(response => response.json())
+				.then(data => {
+					studentTable.innerHTML = '';
+					data.forEach(student => {
+						const row = document.createElement('tr');
+						row.innerHTML = `
+                <td>${student.id}</td>
+                <td>${student.name}</td>
+              `;
+						studentTable.appendChild(row);
+					});
+				})
+				.catch(error => console.error(error));
+		}
+
+
+		const addStudentForm = document.getElementById('add-student-form');
+		addStudentForm.addEventListener('submit', event => {
+			event.preventDefault();
+			const name = document.getElementById('name').value;
+			const data = {name};
+			fetch('http://localhost:8080/students', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(data)
+			})
+				.then(response => {
+					if (response.ok) {
+						console.log('Student added successfully');
+						addStudentForm.reset();
+						updateStudentTable();
+					} else {
+						throw new Error('Failed to add student');
+					}
+				})
+				.catch(error => console.error(error));
+		});   
+
+
+		updateStudentTable();
+		</script>
+</body>
+
+</html>
