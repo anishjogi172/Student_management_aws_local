@@ -14,10 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ttechlab.student.bo.StudentBoImpl;
-
-
-import com.ttechlab.student.dao.StudentDao;
+import com.ttechlab.student.bo.StudentBO;
 import com.ttechlab.student.entity.Student;
 import com.ttechlab.student.exception.BusinessException;
 import com.ttechlab.student.exception.ControllerException;
@@ -31,37 +28,37 @@ public class StudentController {
 	private String storageType;
 	
 	@Autowired
-	private StudentBoImpl studentService;
+	private StudentBO studentBO;
 
 	@GetMapping
 	public ResponseEntity<?> getAllStudents() {
 
 		try {
-			List<Student> student = studentService.getAllStudents();
+			List<Student> student = studentBO.getAllStudents();
 			return new ResponseEntity<List<Student>>(student, HttpStatus.OK);
 		} catch (BusinessException e) {
 			ControllerException ce = new ControllerException(e.getCode(), e.getMessage());
-			return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<ControllerException>(ce, HttpStatus.INTERNAL_SERVER_ERROR);
 
 		} catch (Exception e) {
 			ControllerException ce = new ControllerException("816", "Something went wrong in controller");
-			return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<ControllerException>(ce, HttpStatus.INTERNAL_SERVER_ERROR);
 
 		}
 
 	}
 
 	@PostMapping
-	public ResponseEntity<?> saveStudent(@RequestBody Student student) {
+	public ResponseEntity<?> createStudent(@RequestBody Student student) {
 		try {
-			Student studentDetail = studentService.saveStudent(student);
+			Student studentDetail = studentBO.saveStudent(student);
 			return new ResponseEntity<Student>(studentDetail, HttpStatus.CREATED);
 		} catch (BusinessException e) {
 			ControllerException ce = new ControllerException(e.getCode(), e.getMessage());
-			return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<ControllerException>(ce, HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (Exception e) {
 			ControllerException ce = new ControllerException("815", "Something went wrong in controller");
-			return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<ControllerException>(ce, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 }

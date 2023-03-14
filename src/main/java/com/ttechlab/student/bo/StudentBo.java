@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import com.ttechlab.student.entity.Student;
 import com.ttechlab.student.exception.BusinessException;
 @Service
-public interface StudentBo {
+public interface StudentBO{
 	List<Student> getAllStudents() throws BusinessException;
     Student saveStudent(Student student) throws BusinessException;
 }

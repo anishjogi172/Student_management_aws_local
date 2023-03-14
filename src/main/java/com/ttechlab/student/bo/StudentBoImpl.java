@@ -11,9 +11,10 @@ import com.ttechlab.student.dao.StudentDao;
 
 import com.ttechlab.student.entity.Student;
 import com.ttechlab.student.exception.BusinessException;
+import com.ttechlab.student.exception.DataException;
 
 @Service
-public class StudentBoImpl implements StudentBo {
+public class StudentBoImpl implements StudentBO {
 
 	@Autowired
 	private DaoFactory daoFactory;
@@ -21,12 +22,24 @@ public class StudentBoImpl implements StudentBo {
 	@Override
 	public List<Student> getAllStudents() throws BusinessException {
 
-		return daoFactory.getStudent().getAllStudents();
+		try {
+			return daoFactory.getStudentDao().getAllStudents();
+		} catch (DataException e) {
+			
+			throw new BusinessException("817","something went worng in Bo"); 
+		}
+		
 	}
 
 	@Override
 	public Student saveStudent(Student student) throws BusinessException {
-		return daoFactory.getStudent().saveStudent(student);
+		try {
+			return daoFactory.getStudentDao().saveStudent(student);
+		} catch (DataException e) {
+			throw new BusinessException("818","something went worng in Bo"); 
+			
+		}
+		
 
 	}
 

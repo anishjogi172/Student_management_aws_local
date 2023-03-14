@@ -14,6 +14,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.S3Object;
 import com.ttechlab.student.entity.Student;
 import com.ttechlab.student.exception.BusinessException;
+import com.ttechlab.student.exception.DataException;
 
 @Repository
 public class StudentDaoImplS3 implements StudentDao {
@@ -31,7 +32,7 @@ public class StudentDaoImplS3 implements StudentDao {
 	}
 
 	@Override
-	public List<Student> getAllStudents() throws BusinessException {
+	public List<Student> getAllStudents() throws DataException {
 		S3Object s3Object = s3Client.getObject(bucketName, fileName);
 		InputStream inputStream = s3Object.getObjectContent();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
@@ -49,12 +50,12 @@ public class StudentDaoImplS3 implements StudentDao {
 				line = reader.readLine();
 			}
 		} catch (IOException e) {
-			throw new BusinessException("809", "Failed to read Csv file");
+			throw new DataException("809", "Failed to read Csv file");
 		} finally {
 			try {
 				reader.close();
 			} catch (IOException e) {
-				throw new BusinessException("810", "Failed to close reader");
+				throw new DataException("810", "Failed to close reader");
 			}
 		}
 
@@ -62,13 +63,13 @@ public class StudentDaoImplS3 implements StudentDao {
 	}
 
 	@Override
-	public Student saveStudent(Student student) throws BusinessException {
+	public Student saveStudent(Student student) throws DataException {
 		S3Object s3Object = s3Client.getObject(bucketName, fileName);
 		if (!s3Client.doesBucketExistV2(bucketName)) {
-			throw new BusinessException("811", "Failed to found" + bucketName);
+			throw new DataException("811", "Failed to found" + bucketName);
 		}
 		if (!s3Client.doesObjectExist(bucketName, fileName)) {
-			throw new BusinessException("812", "Failed to found" + fileName);
+			throw new DataException("812", "Failed to found" + fileName);
 		}
 		InputStream inputStream = s3Object.getObjectContent();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
@@ -85,13 +86,13 @@ public class StudentDaoImplS3 implements StudentDao {
 			}
 
 		} catch (IOException e) {
-			throw new BusinessException("813", "Failed to read Csv file");
+			throw new DataException("813", "Failed to read Csv file");
 
 		} finally {
 			try {
 				reader.close();
 			} catch (IOException e) {
-				throw new BusinessException("814", "Failed to close BufferedReader");
+				throw new DataException("814", "Failed to close BufferedReader");
 			}
 		}
 		Long nextId = (long) (lines.size() + 1);
@@ -99,5 +100,10 @@ public class StudentDaoImplS3 implements StudentDao {
 		lines.add(newLine);
 		s3Client.putObject(bucketName, fileName, String.join("\n", lines));
 		return student;
+	}
+
+	@Override
+	public String getSupportedType() {
+		return "s3";
 	}
 }

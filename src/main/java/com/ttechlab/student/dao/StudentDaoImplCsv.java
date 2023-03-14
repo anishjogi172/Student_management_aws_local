@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import com.ttechlab.student.entity.Student;
 import com.ttechlab.student.exception.BusinessException;
+import com.ttechlab.student.exception.DataException;
 
 @Repository
 public class StudentDaoImplCsv implements StudentDao {
@@ -22,7 +23,7 @@ public class StudentDaoImplCsv implements StudentDao {
 	private String csvFilePath;
 
 	@Override
-	public List<Student> getAllStudents() throws BusinessException {
+	public List<Student> getAllStudents() throws DataException {
 		List<Student> students = new ArrayList<>();
 
 		BufferedReader br = null;
@@ -39,27 +40,27 @@ public class StudentDaoImplCsv implements StudentDao {
 
 		} catch (FileNotFoundException e) {
 
-			throw new BusinessException("803", "File not found" + e.getMessage());
+			throw new DataException("803", "File not found" + e.getMessage());
 		}
 
 		catch (Exception e) {
 
-			throw new BusinessException("801", "Something went wrong in Dao" + e.getMessage());
+			throw new DataException("801", "Something went wrong in Dao" + e.getMessage());
 		} finally {
 			try {
 				br.close();
 			} catch (IOException e) {
-				throw new BusinessException("802", "Failed to close BufferedReader");
+				throw new DataException("802", "Failed to close BufferedReader");
 			}
 		}
 		return students;
 	}
 
 	@Override
-	public Student saveStudent(Student student) throws BusinessException {
+	public Student saveStudent(Student student) throws DataException {
 		File file = new File(csvFilePath);
 		if (!file.exists()) {
-			throw new BusinessException("804", "File not found");
+			throw new DataException("804", "File not found");
 		}
 		FileReader fr = null;
 		BufferedReader br = null;
@@ -89,27 +90,32 @@ public class StudentDaoImplCsv implements StudentDao {
 			fw.write(student.getId() + "," + student.getName() + "\n");
 
 		} catch (Exception e) {
-			throw new BusinessException("805", "Something went wrong in Dao" + e.getMessage());
+			throw new DataException("805", "Something went wrong in Dao" + e.getMessage());
 		} finally {
 
 			try {
 				br.close();
 			} catch (IOException e1) {
-				throw new BusinessException("806", "Failed to close BufferedReader");
+				throw new DataException("806", "Failed to close BufferedReader");
 			}
 			try {
 				fr.close();
 			} catch (IOException e) {
-				throw new BusinessException("807", "Failed to close FileReader");
+				throw new DataException("807", "Failed to close FileReader");
 			}
 			try {
 				fw.close();
 			} catch (IOException e) {
-				throw new BusinessException("808", "Failed to close FileWriter");
+				throw new DataException("808", "Failed to close FileWriter");
 			}
 
 		}
 		return student;
+	}
+
+	@Override
+	public String getSupportedType() {
+		return "csv";
 	}
 
 }
